@@ -1,6 +1,12 @@
+github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d h1:Byv0BzEl3/e6D5CLfI0j/7hiIEtvGVFPCZ7Ei2oq8iQ=
+github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/ieee0824/getenv v1.0.0 h1:yHtTX3TaCqNP+zv6ZzHHaY20GFz7H5F0rM9b+27Kd0Q=
 github.com/ieee0824/getenv v1.0.0/go.mod h1:I8UpRmxPENTomDHIt24SFA1OC3issZkXzBlV4SA2l6c=
+github.com/ssoroka/slice v0.0.0-20220402005549-78f0cea3df8b h1:nDFJ1KYD1CSRP3nHtkvCH+ztuoz+QW++OvCLgpS6kQE=
+github.com/ssoroka/slice v0.0.0-20220402005549-78f0cea3df8b/go.mod h1:l4Ov7Zo7X3/MCC+pefg/lN7x8X8FKb1Ub7oxosKKJa0=
+golang.org/x/exp v0.0.0-20220328175248-053ad81199eb h1:pC9Okm6BVmxEw76PUu0XUbOTQ92JX11hfvqTjAV3qxM=
+golang.org/x/exp v0.0.0-20220328175248-053ad81199eb/go.mod h1:lgLbSvA5ygNOMpwM/9anMpWVlVJ7Z+cHWq/eFuinpGE=

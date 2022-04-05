@@ -1,4 +1,4 @@
-package entities
+package entity
 
 type Medication struct {
 	Name   string
