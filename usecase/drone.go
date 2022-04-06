@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	"drones.com/repository"
+	repoEntity "drones.com/repository/entity"
 	"drones.com/usecase/entity"
 	"github.com/asaskevich/govalidator"
 )
@@ -16,10 +18,11 @@ type DroneUsecase interface {
 }
 
 type droneUsecase struct {
+	droneRepo repository.IDroneRepo
 }
 
-func NewDroneUsecase() DroneUsecase {
-	return droneUsecase{}
+func NewDroneUsecase(droneRepository repository.IDroneRepo) DroneUsecase {
+	return droneUsecase{droneRepo: droneRepository}
 }
 
 func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (response []byte, err error) {
@@ -42,7 +45,24 @@ func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (respon
 	if err != nil && !validateDroneRequest {
 		return []byte{}, err
 	}
-	return
+	// by default drone battery capacity is 100 and state is IDLE in creation
+	droneRequest.BatteryCapacity = 100
+	droneRequest.State = string(entity.IDLE)
+	droneRepoEntity := repoEntity.Drone{}
+	droneRepoEntity.SerialNumber = droneRequest.SerialNumber
+	droneRepoEntity.Model = droneRequest.Model
+	droneRepoEntity.Weight = droneRequest.Weight
+	droneRepoEntity.BatteryCapacity = droneRequest.Weight
+	droneRepoEntity.State = droneRequest.State
+	repoQueryResult, err := d.droneRepo.Create(ctx, droneRepoEntity)
+	if err != nil {
+		return []byte{}, err
+	}
+	result, err := json.Marshal(repoQueryResult)
+	if err != nil {
+		return []byte{}, nil
+	}
+	return result, nil
 }
 
 func IsInvalidWeightErr(err error) bool {
@@ -51,7 +71,7 @@ func IsInvalidWeightErr(err error) bool {
 
 func IsValidDroneModel(requestDrone entity.Drone) bool {
 	for i := 0; i < len(entity.DroneModels); i++ {
-		if requestDrone.Model == entity.DroneModels[i] {
+		if requestDrone.Model == string(entity.DroneModels[i]) {
 			return true
 		}
 	}

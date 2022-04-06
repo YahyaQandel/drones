@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+
+	"drones.com/repository/mocks"
 )
 
 func Test_droneUsecase_RegisterDrone(t *testing.T) {
@@ -47,16 +49,24 @@ func Test_droneUsecase_RegisterDrone(t *testing.T) {
 			want:    `model: should be option of [Lightweight Middleweight Cruiserweight Heavyweight]`,
 			wantErr: true,
 		},
+		{
+			name:    "successful case",
+			d:       droneUsecase{},
+			args:    args{ctx: context.Background(), request: []byte(`{"serial_number": "SDXDFSFEAADSF","model":"Lightweight","weight":100.0}`)},
+			want:    "",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := droneUsecase{}
-			_, err := d.RegisterDrone(tt.args.ctx, tt.args.request)
+			mockedRepo := mocks.NewMockedDroneRepository()
+			droneUsecase := NewDroneUsecase(mockedRepo)
+			_, err := droneUsecase.RegisterDrone(tt.args.ctx, tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("droneUsecase.RegisterDrone() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(err.Error(), tt.want) {
+			if (err != nil) && !reflect.DeepEqual(err.Error(), tt.want) {
 				t.Errorf("droneUsecase.RegisterDrone() = %v, want %v", err.Error(), tt.want)
 			}
 		})

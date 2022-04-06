@@ -1,0 +1,15 @@
+test:
+    driver: postgres
+    open: $TEST_DB_CONNECTION_STRING
+
+development:
+    driver: postgres
+    open: $DB_CONNECTION_STRING
+
+production:
+    driver: postgres
+    open: user=user dbname=dbname sslmode=verify-full
+
+environment_variable_config:
+    driver: postgres
+    open: $DB_CONNECTION_STRING
