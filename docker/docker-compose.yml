@@ -5,7 +5,6 @@ services:
         container_name: postgres-task
         restart: always
         volumes:
-            - ./pgdata:/var/lib/postgresql/data
             - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
         environment:
             - POSTGRES_PASSWORD=taskpassword

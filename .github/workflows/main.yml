@@ -12,10 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-
+    
     - name: Build && test
-      run: cd docker && docker-compose up
+      run: cd docker && docker compose up --abort-on-container-exit --exit-code-from go
 
