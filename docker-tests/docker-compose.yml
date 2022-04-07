@@ -2,7 +2,7 @@ version: '3'
 services:
     postgres:
         image: postgres
-        container_name: postgres-task
+        container_name: postgres-task-test
         restart: always
         volumes:
             - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -23,7 +23,7 @@ services:
 
     go:
         image: golang:1.17
-        container_name: go-task
+        container_name: go-task-test
         environment:
             - TEST_DB_CONNECTION_STRING=host=postgres user=taskuser port=5432 password=taskpassword dbname=tasktest search_path=dronetask sslmode=disable
         volumes:
