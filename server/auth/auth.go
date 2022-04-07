@@ -39,7 +39,8 @@ func Auth(h http.Handler) http.Handler {
 		}
 		tokenString = strings.Replace(tokenString, "Bearer ", "", 1)
 		claims, err := verifyToken(tokenString, signingKey)
-		if err != nil {
+		_, found := claims["Role"]
+		if err != nil || !found {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("Error verifying JWT token: " + err.Error()))
 			return

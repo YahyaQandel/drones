@@ -10,10 +10,10 @@ import (
 )
 
 type DroneApi struct {
-	droneUsecase usecase.DroneUsecase
+	droneUsecase usecase.IDroneUsecase
 }
 
-func NewDroneAPI(useCase usecase.DroneUsecase) DroneApi {
+func NewDroneAPI(useCase usecase.IDroneUsecase) DroneApi {
 	return DroneApi{
 		droneUsecase: useCase,
 	}

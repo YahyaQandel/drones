@@ -13,7 +13,7 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-type DroneUsecase interface {
+type IDroneUsecase interface {
 	RegisterDrone(ctx context.Context, request []byte) ([]byte, error)
 }
 
@@ -21,7 +21,7 @@ type droneUsecase struct {
 	droneRepo repository.IDroneRepo
 }
 
-func NewDroneUsecase(droneRepository repository.IDroneRepo) DroneUsecase {
+func NewDroneUsecase(droneRepository repository.IDroneRepo) IDroneUsecase {
 	return droneUsecase{droneRepo: droneRepository}
 }
 

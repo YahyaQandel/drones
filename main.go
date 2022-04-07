@@ -19,9 +19,12 @@ func main() {
 	}
 	droneRepository := repository.NewDroneRepository(dbClient)
 	droneUsecase := usecase.NewDroneUsecase(droneRepository)
+	medicationUsecase := usecase.NewMedicationUsecase(droneRepository)
 	droneApi := server.NewDroneAPI(droneUsecase)
+	medicationApi := server.NewMedicationAPI(medicationUsecase)
 	apis := server.APIs{
-		DronesApi: droneApi,
+		DronesApi:     droneApi,
+		MedicationApi: medicationApi,
 	}
 	server.StartServer(apis)
 }
