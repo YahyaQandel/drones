@@ -10,8 +10,6 @@ import (
 	"drones.com/repository"
 )
 
-const MEDICATION_IMAGES_PATH = "medications-images/"
-
 type IMedicationeUsecase interface {
 	RegisterMedication(ctx context.Context, r *http.Request) ([]byte, error)
 }
@@ -40,7 +38,7 @@ func (d medicationUsecase) RegisterMedication(ctx context.Context, r *http.Reque
 	if fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "image/png" {
 		return []byte{}, errors.New(fmt.Sprintf("unsupported file type %s, acceptable types (png/jpeg/jpg)", fileType))
 	}
-	err = d.ioFile.SaveImage(file, *handler, MEDICATION_IMAGES_PATH)
+	err = d.ioFile.SaveImage(file, *handler, "ANYNAME")
 	if err != nil {
 		return []byte{}, err
 	}

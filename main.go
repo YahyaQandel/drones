@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"log"
 
+	"drones.com/iofile"
 	"drones.com/repository"
 	"drones.com/repository/db"
 	"drones.com/server"
 	"drones.com/usecase"
 )
+
+const MEDICATION_IMAGES_PATH = "medications-images/"
 
 func main() {
 	fmt.Println("Hello World, Drones waiting... !")
@@ -19,7 +22,8 @@ func main() {
 	}
 	droneRepository := repository.NewDroneRepository(dbClient)
 	droneUsecase := usecase.NewDroneUsecase(droneRepository)
-	medicationUsecase := usecase.NewMedicationUsecase(droneRepository)
+	ioFile := iofile.NewIOFile(MEDICATION_IMAGES_PATH)
+	medicationUsecase := usecase.NewMedicationUsecase(droneRepository, ioFile)
 	droneApi := server.NewDroneAPI(droneUsecase)
 	medicationApi := server.NewMedicationAPI(medicationUsecase)
 	apis := server.APIs{

@@ -30,7 +30,7 @@ func NewIOFile(folderPath string) IIOFile {
 
 func (i IOFile) SaveImage(file multipart.File, handler multipart.FileHeader, filePath string) (err error) {
 	defer file.Close()
-	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(i.folderPath+filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		fmt.Println(err)
 		return
