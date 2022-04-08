@@ -24,11 +24,11 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] Register drone
     - [✔] Register medication 
     - [✔] Load drone with medication
-    - [X] Checking loaded medication items for a given drone;
+    - [✔] Checking loaded medication items for a given drone;
     - [X] checking available drones for loading;
     - [X] check drone battery level for a given drone;
     - [X] A drone battery decreases each 1 minute by `3%` if his state is `LOADED`
-
+    - [X] periodic task checks drone battery level
 
 
 ### System behaviors
@@ -40,3 +40,54 @@ you will need to call `/drone/load` multiple times each with the new medication
 4- images saved with medication code
 5- Images are not uploaded to any server it is just saved on your repo , what should be done is to push images to 
 remote server specific for images (amazon bucker for example)
+
+
+### Functionality 
+
+* Register drone request
+```
+curl --request POST \
+  --url http://localhost:9090/api/drone/ \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"serial_number": "firstDrone",
+	"model": "Lightweight",
+	"weight": 60
+}'
+```
+
+* Register medication
+```
+curl --request POST \
+  --url http://localhost:9090/api/medication/ \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
+  --header 'Content-Type: multipart/form-data; boundary=---011000010111000001101001' \
+  --form image=@/home/yahia/Pictures/2022-04-05_12-55.png \
+  --form name=panadol \
+  --form weight=20.6 \
+  --form code=PDL1
+  ```
+  
+  * Load drone with medication
+  ```
+  curl --request POST \
+  --url http://localhost:9090/api/drone/load \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"drone_serial_number":"firstDrone",
+	"medication_code":"PDL1"
+}'
+```
+
+* Get all loaded medication items
+```
+curl --request GET \
+  --url 'http://localhost:9090/api/drone/medication?drone_serial_number=firstDrone' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
+  ````
+
+
+### System diagram
+![Graph](/drone.jpg "system design")
