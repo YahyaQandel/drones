@@ -9,22 +9,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type DroneNotExistsRepository struct {
+type MockedDroneNotExistsRepository struct {
 	client *gorm.DB
 }
 
 func NewMockedDroneNotExistsRepository() repository.IDroneRepo {
-	return &DroneNotExistsRepository{}
+	return &MockedDroneNotExistsRepository{}
 }
 
-func (cdb DroneNotExistsRepository) Create(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+func (cdb MockedDroneNotExistsRepository) Create(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
 
-func (cdb DroneNotExistsRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+func (cdb MockedDroneNotExistsRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, gorm.ErrRecordNotFound
 }
 
-func (cdb DroneNotExistsRepository) IsNotFoundErr(err error) bool {
+func (cdb MockedDroneNotExistsRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
+}
+
+func (cdb MockedDroneNotExistsRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	return entity.Drone{}, nil
 }

@@ -5,24 +5,29 @@ import (
 
 	"drones.com/repository"
 	"drones.com/repository/entity"
+	usecaseEntity "drones.com/usecase/entity"
 )
 
-type DroneBatteryLessThan25Repository struct {
+type MockedDroneBatteryLessThan25Repository struct {
 	batteryCapacity float64
 }
 
 func NewDroneBatteryLessThan25Repository(batteryCapacity float64) repository.IDroneRepo {
-	return &DroneBatteryLessThan25Repository{batteryCapacity: batteryCapacity}
+	return &MockedDroneBatteryLessThan25Repository{batteryCapacity: batteryCapacity}
 }
 
-func (cdb DroneBatteryLessThan25Repository) Create(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+func (cdb MockedDroneBatteryLessThan25Repository) Create(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
 
-func (cdb DroneBatteryLessThan25Repository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
-	return entity.Drone{BatteryCapacity: cdb.batteryCapacity}, nil
+func (cdb MockedDroneBatteryLessThan25Repository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	return entity.Drone{BatteryCapacity: cdb.batteryCapacity, State: string(usecaseEntity.IDLE)}, nil
 }
 
-func (cdb DroneBatteryLessThan25Repository) IsNotFoundErr(err error) bool {
+func (cdb MockedDroneBatteryLessThan25Repository) IsNotFoundErr(err error) bool {
 	return false
+}
+
+func (cdb MockedDroneBatteryLessThan25Repository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	return entity.Drone{}, nil
 }

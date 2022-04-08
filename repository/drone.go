@@ -11,6 +11,7 @@ import (
 type IDroneRepo interface {
 	Create(ctx context.Context, drone entity.Drone) (entity.Drone, error)
 	Get(ctx context.Context, drone entity.Drone) (entity.Drone, error)
+	Update(ctx context.Context, drone entity.Drone) (entity.Drone, error)
 	IsNotFoundErr(err error) bool
 }
 
@@ -27,6 +28,11 @@ func (cdb DroneRepository) Create(ctx context.Context, drone entity.Drone) (enti
 	if result.Error != nil {
 		return entity.Drone{}, result.Error
 	}
+	return drone, nil
+}
+
+func (cdb DroneRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	cdb.client.WithContext(ctx).Model(&drone).Updates(drone)
 	return drone, nil
 }
 

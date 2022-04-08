@@ -5,6 +5,7 @@ import (
 
 	"drones.com/repository"
 	"drones.com/repository/entity"
+	usecaseEntity "drones.com/usecase/entity"
 	"gorm.io/gorm"
 )
 
@@ -21,9 +22,13 @@ func (cdb DroneRepository) Create(ctx context.Context, drone entity.Drone) (enti
 }
 
 func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
-	return entity.Drone{}, nil
+	return entity.Drone{State: string(usecaseEntity.IDLE)}, nil
 }
 
 func (cdb DroneRepository) IsNotFoundErr(err error) bool {
 	return false
+}
+
+func (cdb DroneRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	return entity.Drone{}, nil
 }

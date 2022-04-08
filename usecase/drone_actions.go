@@ -58,6 +58,8 @@ func (d droneActionUsecase) LoadDrone(ctx context.Context, request []byte) (resp
 	if err != nil {
 		return []byte{}, err
 	}
+	drone.State = string(entity.LOADED)
+	d.droneRepo.Update(ctx, drone)
 	responseMessage := []byte(fmt.Sprintf(`{"message": "drone '%s' loaded with medication '%s'"}`, drone.SerialNumber, medication.Code))
 	return responseMessage, nil
 }
