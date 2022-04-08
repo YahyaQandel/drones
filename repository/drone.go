@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"drones.com/repository/entity"
 	"gorm.io/gorm"
@@ -9,6 +10,8 @@ import (
 
 type IDroneRepo interface {
 	Create(ctx context.Context, drone entity.Drone) (entity.Drone, error)
+	Get(ctx context.Context, drone entity.Drone) (entity.Drone, error)
+	IsNotFoundErr(err error) bool
 }
 
 type DroneRepository struct {
@@ -25,4 +28,20 @@ func (cdb DroneRepository) Create(ctx context.Context, drone entity.Drone) (enti
 		return entity.Drone{}, result.Error
 	}
 	return drone, nil
+}
+
+func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	droneResponse := entity.Drone{}
+	result := cdb.client.WithContext(ctx).Where(&entity.Drone{SerialNumber: drone.SerialNumber}).Last(&droneResponse)
+	if cdb.IsNotFoundErr(result.Error) {
+		return entity.Drone{}, result.Error
+	}
+	if result.Error != nil {
+		return entity.Drone{}, result.Error
+	}
+	return droneResponse, nil
+}
+
+func (cdb DroneRepository) IsNotFoundErr(err error) bool {
+	return errors.Is(err, gorm.ErrRecordNotFound)
 }

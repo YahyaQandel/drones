@@ -36,15 +36,19 @@ func (d medicationUsecase) RegisterMedication(ctx context.Context, r *http.Reque
 	if err != nil {
 		return []byte{}, err
 	}
-	imageName, err := d.ioFile.SaveImage(medicationRequest.Name)
-	if err != nil {
-		return []byte{}, err
+	medicationExists, err := d.medicationRepo.Get(ctx, medicationRequest)
+	if !d.medicationRepo.IsNotFoundErr(err) && medicationExists.Code == medicationRequest.Code {
+		return []byte{}, errors.New("medication with this code already exists")
 	}
-	medicationRequest.Image = imageName
 	medicationObject, err := d.medicationRepo.Create(ctx, medicationRequest)
 	if err != nil {
 		return []byte{}, err
 	}
+	imageName, err := d.ioFile.SaveImage(medicationRequest.Code)
+	if err != nil {
+		return []byte{}, err
+	}
+	medicationRequest.Image = imageName
 	medicationJsonObj, err := json.Marshal(medicationObject)
 	if err != nil {
 		return []byte{}, err

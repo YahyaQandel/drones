@@ -54,7 +54,8 @@ func Test_droneUsecase_RegisterDrone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockedRepo := mocks.NewMockedDroneRepository()
-			droneUsecase := NewDroneUsecase(mockedRepo)
+			medicationRepo := mocks.NewMockedMedicationRepository()
+			droneUsecase := NewDroneUsecase(mockedRepo, medicationRepo)
 			_, err := droneUsecase.RegisterDrone(tt.args.ctx, tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("droneUsecase.RegisterDrone() error = %v, wantErr %v", err, tt.wantErr)

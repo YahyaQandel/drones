@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"drones.com/repository/entity"
 	"gorm.io/gorm"
@@ -9,6 +10,8 @@ import (
 
 type IMedicationRepo interface {
 	Create(ctx context.Context, medication entity.Medication) (entity.Medication, error)
+	Get(ctx context.Context, medication entity.Medication) (entity.Medication, error)
+	IsNotFoundErr(err error) bool
 }
 
 type MedicationRepository struct {
@@ -25,4 +28,20 @@ func (cdb MedicationRepository) Create(ctx context.Context, medication entity.Me
 		return entity.Medication{}, result.Error
 	}
 	return medication, nil
+}
+
+func (cdb MedicationRepository) Get(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+	medicationResponse := entity.Medication{}
+	result := cdb.client.WithContext(ctx).Where(&entity.Medication{Code: drone.Code}).Last(&medicationResponse)
+	if cdb.IsNotFoundErr(result.Error) {
+		return entity.Medication{}, result.Error
+	}
+	if result.Error != nil {
+		return entity.Medication{}, result.Error
+	}
+	return medicationResponse, nil
+}
+
+func (cdb MedicationRepository) IsNotFoundErr(err error) bool {
+	return errors.Is(err, gorm.ErrRecordNotFound)
 }

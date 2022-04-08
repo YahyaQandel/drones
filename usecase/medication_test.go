@@ -24,6 +24,7 @@ func Test_medicationUsecase_RegisterMedication(t *testing.T) {
 		r                *http.Request
 		imageName        string
 		medicationParams map[string]string
+		medicationRepo   repository.IMedicationRepo
 	}
 	tests := []struct {
 		name         string
@@ -34,54 +35,105 @@ func Test_medicationUsecase_RegisterMedication(t *testing.T) {
 		want         string
 	}{
 		{
-			name:         "invalid image ext",
-			fields:       fields{},
-			args:         args{ctx: context.Background(), imageName: "invalid_image.txt", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
+			name:   "invalid image ext",
+			fields: fields{},
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "invalid_image.txt",
+				medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantResponse: []byte{},
 			wantErr:      true,
 			want:         "unsupported file type text/plain; charset=utf-8, acceptable types (png/jpeg/jpg)",
 		},
 		{
-			name:    "image larger than 5 mb",
-			args:    args{ctx: context.Background(), imageName: "image_5mb.jpg", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
+			name: "image larger than 5 mb",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "image_5mb.jpg",
+				medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "image size '5.002336' is larger than 5mb",
 		},
 		{
-			name:    "successful image save",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
+			name: "successful image save",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: false,
 			want:    "",
 		},
 		{
-			name:    "invalid medication name (special chars )",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "$$#xfsdf", "code": "RX_10", "weight": "10.1"}},
+			name: "invalid medication name (special chars )",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "$$#xfsdf", "code": "RX_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "invalid medication name, (allowed only letters, numbers, '-', '_')",
 		},
 		{
-			name:    "invalid medication name ( empty )",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "", "code": "RX_10", "weight": "10.1"}},
+			name: "invalid medication name ( empty )",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "", "code": "RX_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "invalid medication name, (allowed only letters, numbers, '-', '_')",
 		},
 		{
-			name:    "invalid medication code ( lowercase letters )",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "rx_10", "weight": "10.1"}},
+			name: "invalid medication code ( lowercase letters )",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "Rx", "code": "rx_10", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "invalid medication code, (allowed only upper case letters, underscore and numbers)",
 		},
 		{
-			name:    "invalid medication code ( empty )",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "", "weight": "10.1"}},
+			name: "invalid medication code ( empty )",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "Rx", "code": "", "weight": "10.1"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "invalid medication code, (allowed only upper case letters, underscore and numbers)",
 		},
 		{
-			name:    "invalid weight",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "RX_10", "weight": "x"}},
+			name: "invalid weight",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "Rx", "code": "RX_10", "weight": "x"},
+				medicationRepo:   mocks.NewMockedMedicationRepository(),
+			},
 			wantErr: true,
 			want:    "invalid medication wegiht",
+		},
+		{
+			name: "add medication twice",
+			args: args{
+				ctx:              context.Background(),
+				imageName:        "test_image.jpeg",
+				medicationParams: map[string]string{"name": "rx", "code": "RX", "weight": "10"},
+				medicationRepo:   mocks.NewMedicationExistsRepository(),
+			},
+			wantErr: false,
+			want:    "medication with same code already exists",
 		},
 	}
 	for _, tt := range tests {

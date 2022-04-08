@@ -19,3 +19,11 @@ func NewMockedDroneRepository() repository.IDroneRepo {
 func (cdb DroneRepository) Create(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
+
+func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
+	return entity.Drone{}, nil
+}
+
+func (cdb DroneRepository) IsNotFoundErr(err error) bool {
+	return false
+}

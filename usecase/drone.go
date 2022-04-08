@@ -18,11 +18,12 @@ type IDroneUsecase interface {
 }
 
 type droneUsecase struct {
-	droneRepo repository.IDroneRepo
+	droneRepo      repository.IDroneRepo
+	medicationRepo repository.IMedicationRepo
 }
 
-func NewDroneUsecase(droneRepository repository.IDroneRepo) IDroneUsecase {
-	return droneUsecase{droneRepo: droneRepository}
+func NewDroneUsecase(droneRepository repository.IDroneRepo, medicationRepository repository.IMedicationRepo) IDroneUsecase {
+	return droneUsecase{droneRepo: droneRepository, medicationRepo: medicationRepository}
 }
 
 func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (response []byte, err error) {
