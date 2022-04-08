@@ -11,6 +11,7 @@ import (
 type IDroneActionRepo interface {
 	CreateDroneMedication(ctx context.Context, droneMedication entity.DroneMedication) (entity.DroneMedication, error)
 	Get(ctx context.Context, droneMedication entity.DroneMedication) (entity.DroneMedication, error)
+	GetDroneMedications(ctx context.Context, droneMedication entity.DroneMedication) ([]entity.DroneMedication, error)
 	IsNotFoundErr(err error) bool
 }
 
@@ -44,4 +45,16 @@ func (cdb DroneActionRepository) Get(ctx context.Context, droneMedication entity
 
 func (cdb DroneActionRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
+}
+
+func (cdb DroneActionRepository) GetDroneMedications(ctx context.Context, droneMedication entity.DroneMedication) ([]entity.DroneMedication, error) {
+	droneMedications := []entity.DroneMedication{}
+	result := cdb.client.WithContext(ctx).Where(&entity.DroneMedication{DroneSerialNumber: droneMedication.DroneSerialNumber}).Find(&droneMedications)
+	if cdb.IsNotFoundErr(result.Error) {
+		return []entity.DroneMedication{}, result.Error
+	}
+	if result.Error != nil {
+		return []entity.DroneMedication{}, result.Error
+	}
+	return droneMedications, nil
 }

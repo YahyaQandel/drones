@@ -100,11 +100,25 @@ func Test_droneActionUsecase_LoadDrone(t *testing.T) {
 			droneState: string(entity.IDLE),
 		},
 		{
+			// TODO: add assertion that repo droneMedication create method not called
+			name: "drone cannot be loaded with same medication twice",
+			args: args{
+				ctx:             context.Background(),
+				request:         []byte(`{"drone_serial_number": "XDX","medication_code":"RX"}`),
+				droneRepo:       mocks.NewMockedLoadedDroneRepository(),
+				medicationRepo:  mocks.NewMockedMedicationRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionAlreadyLoadedWithSameDroneAndMedicationRepository(),
+			},
+			want:       fmt.Sprintf("drone with serial number 'XDX' is already loaded with medication with code 'RX'"),
+			wantErr:    true,
+			droneState: string(entity.LOADED),
+		},
+		{
 			name: "drone loaded successfully",
 			args: args{
 				ctx:             context.Background(),
 				request:         []byte(`{"drone_serial_number": "XDX","medication_code":"RX"}`),
-				droneRepo:       mocks.NewMockedLoadedDroneExistsRepository(),
+				droneRepo:       mocks.NewMockedDroneExistsRepository(),
 				medicationRepo:  mocks.NewMedicationExistsRepository(),
 				droneActionRepo: mocks.NewMockedDroneActionRepository(),
 			},
@@ -130,6 +144,54 @@ func Test_droneActionUsecase_LoadDrone(t *testing.T) {
 			receivedDrone, err := tt.args.droneRepo.Get(tt.args.ctx, droneRepo)
 			if tt.droneState != "" && receivedDrone.State != tt.droneState {
 				t.Errorf("droneActionUsecase.LoadDrone() = %v, want %v", receivedDrone.State, tt.droneState)
+			}
+		})
+	}
+}
+
+func Test_droneActionUsecase_GetLoadedMedicationItems(t *testing.T) {
+	type fields struct {
+		droneRepo           repository.IDroneRepo
+		medicationRepo      repository.IMedicationRepo
+		droneMedicationRepo repository.IDroneActionRepo
+	}
+	type args struct {
+		ctx             context.Context
+		request         []byte
+		droneRepo       repository.IDroneRepo
+		medicationRepo  repository.IMedicationRepo
+		droneActionRepo repository.IDroneActionRepo
+	}
+	tests := []struct {
+		name         string
+		fields       fields
+		args         args
+		wantResponse []byte
+		wantErr      bool
+	}{
+		{
+			name: "get all loaded medications for specific drone",
+			args: args{
+				ctx:             context.Background(),
+				request:         []byte(`{"drone_serial_number": "XDX"}`),
+				droneRepo:       mocks.NewMockedDroneRepository(),
+				medicationRepo:  mocks.NewMedicationGetAllRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionGetAllMedicationRepository(),
+			},
+			wantResponse: []byte(`{{"id":"1","name":"Aspirin","weight":100.00,"code":"RX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"},{"id":"2","name":"Advil","weight":200.00,"code":"UX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"}{"id":"3","name":"Vicodin","weight":300.00,"code":"DX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"}`),
+			wantErr:      false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			droneActionUsecase := NewDroneActionUsecase(tt.args.droneRepo, tt.args.medicationRepo, tt.args.droneActionRepo)
+			gotResponse, err := droneActionUsecase.GetLoadedMedicationItems(tt.args.ctx, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("droneActionUsecase.GetLoadedMedicationItems() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if string(gotResponse) == string(tt.wantResponse) {
+				t.Errorf("droneActionUsecase.GetLoadedMedicationItems() = %v, want %v", gotResponse, tt.wantResponse)
 			}
 		})
 	}

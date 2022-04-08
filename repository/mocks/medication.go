@@ -16,11 +16,14 @@ func NewMockedMedicationRepository() repository.IMedicationRepo {
 	return &MedicationRepository{}
 }
 
-func (cdb MedicationRepository) Create(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationRepository) Create(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, nil
 }
 
-func (cdb MedicationRepository) Get(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationRepository) Update(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	return entity.Medication{}, nil
+}
+func (cdb MedicationRepository) Get(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, nil
 }
 

@@ -27,3 +27,7 @@ func (cdb MockedDroneActionRepository) Get(ctx context.Context, droneMedication 
 func (cdb MockedDroneActionRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
 }
+
+func (cdb MockedDroneActionRepository) GetDroneMedications(ctx context.Context, droneMedication entity.DroneMedication) ([]entity.DroneMedication, error) {
+	return []entity.DroneMedication{}, nil
+}

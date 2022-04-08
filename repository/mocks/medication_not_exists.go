@@ -16,11 +16,15 @@ func NewMockedMedicationNotExistsRepository() repository.IMedicationRepo {
 	return &MedicationNotExistsRepository{}
 }
 
-func (cdb MedicationNotExistsRepository) Create(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationNotExistsRepository) Create(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, nil
 }
 
-func (cdb MedicationNotExistsRepository) Get(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationNotExistsRepository) Update(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	return entity.Medication{}, nil
+}
+
+func (cdb MedicationNotExistsRepository) Get(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, gorm.ErrRecordNotFound
 }
 

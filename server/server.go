@@ -29,6 +29,7 @@ func StartServer(apis APIs) {
 	droneRouter.StrictSlash(true)
 	droneRouter.HandleFunc("/", apis.DronesApi.Create).Methods("POST")
 	droneRouter.HandleFunc("/load", apis.DroneActionApi.Load).Methods("POST")
+	droneRouter.HandleFunc("/medication", apis.DroneActionApi.GetLoadedMedicationItems).Methods("GET")
 
 	medicationRouter := r.PathPrefix("/medication").Subrouter()
 	medicationRouter.Use(auth.Auth)

@@ -17,11 +17,15 @@ func NewMedicationOverWeightRepository(weight float64) repository.IMedicationRep
 	return &MedicationOverWeightRepository{weight: weight}
 }
 
-func (cdb MedicationOverWeightRepository) Create(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationOverWeightRepository) Create(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, nil
 }
 
-func (cdb MedicationOverWeightRepository) Get(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationOverWeightRepository) Update(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	return entity.Medication{}, nil
+}
+
+func (cdb MedicationOverWeightRepository) Get(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{Weight: cdb.weight}, nil
 }
 

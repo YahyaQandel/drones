@@ -10,6 +10,7 @@ import (
 
 type IMedicationRepo interface {
 	Create(ctx context.Context, medication entity.Medication) (entity.Medication, error)
+	Update(ctx context.Context, medication entity.Medication) (entity.Medication, error)
 	Get(ctx context.Context, medication entity.Medication) (entity.Medication, error)
 	IsNotFoundErr(err error) bool
 }
@@ -24,6 +25,14 @@ func NewMedicationRepository(client *gorm.DB) IMedicationRepo {
 
 func (cdb MedicationRepository) Create(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	result := cdb.client.WithContext(ctx).Create(&medication)
+	if result.Error != nil {
+		return entity.Medication{}, result.Error
+	}
+	return medication, nil
+}
+
+func (cdb MedicationRepository) Update(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	result := cdb.client.WithContext(ctx).Save(&medication)
 	if result.Error != nil {
 		return entity.Medication{}, result.Error
 	}

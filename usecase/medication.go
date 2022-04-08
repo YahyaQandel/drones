@@ -36,6 +36,15 @@ func (d medicationUsecase) RegisterMedication(ctx context.Context, r *http.Reque
 	if err != nil {
 		return []byte{}, err
 	}
+	if medicationRequest.Code == "" {
+		return []byte{}, errors.New("medication code is required")
+	}
+	if medicationRequest.Name == "" {
+		return []byte{}, errors.New("medication name is required")
+	}
+	if medicationRequest.Weight == 0 {
+		return []byte{}, errors.New("medication weight is required")
+	}
 	medicationExists, err := d.medicationRepo.Get(ctx, medicationRequest)
 	if !d.medicationRepo.IsNotFoundErr(err) && medicationExists.Code == medicationRequest.Code {
 		return []byte{}, errors.New("medication with this code already exists")
@@ -49,6 +58,11 @@ func (d medicationUsecase) RegisterMedication(ctx context.Context, r *http.Reque
 		return []byte{}, err
 	}
 	medicationRequest.Image = imageName
+	medicationRequest.ID = medicationObject.ID
+	medicationObject, err = d.medicationRepo.Update(ctx, medicationRequest)
+	if err != nil {
+		return []byte{}, err
+	}
 	medicationJsonObj, err := json.Marshal(medicationObject)
 	if err != nil {
 		return []byte{}, err
@@ -85,6 +99,7 @@ func isValidWeight(weight string) (isValid bool, result float64) {
 
 func (d medicationUsecase) fillInMedicationObjFromRequest(r *http.Request, medication *repoEntity.Medication) error {
 	reader, err := r.MultipartReader()
+	medicationImageParamExists := false
 	if err != nil {
 		return err
 	}
@@ -123,6 +138,7 @@ func (d medicationUsecase) fillInMedicationObjFromRequest(r *http.Request, medic
 			if fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "image/png" {
 				return errors.New(fmt.Sprintf("unsupported file type %s, acceptable types (png/jpeg/jpg)", fileType))
 			}
+			medicationImageParamExists = true
 		case "weight":
 			medicationWeight := getFormFieldValue(p, field)
 			isValid, weightFloat := isValidWeight(medicationWeight)
@@ -132,6 +148,9 @@ func (d medicationUsecase) fillInMedicationObjFromRequest(r *http.Request, medic
 			medication.Weight = weightFloat
 		}
 
+	}
+	if !medicationImageParamExists {
+		return errors.New("image is required")
 	}
 	return nil
 }

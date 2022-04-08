@@ -16,11 +16,15 @@ func NewMedicationExistsRepository() repository.IMedicationRepo {
 	return &MedicationExistsRepository{}
 }
 
-func (cdb MedicationExistsRepository) Create(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationExistsRepository) Create(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{}, nil
 }
 
-func (cdb MedicationExistsRepository) Get(ctx context.Context, drone entity.Medication) (entity.Medication, error) {
+func (cdb MedicationExistsRepository) Update(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	return entity.Medication{}, nil
+}
+
+func (cdb MedicationExistsRepository) Get(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
 	return entity.Medication{Code: "RX", Weight: 10}, nil
 }
 

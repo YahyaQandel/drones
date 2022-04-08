@@ -38,3 +38,26 @@ func (api DroneActionApi) Load(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 	w.Write(response)
 }
+
+func (api DroneActionApi) GetLoadedMedicationItems(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	params, ok := r.URL.Query()["drone_serial_number"]
+
+	if !ok || len(params[0]) < 1 {
+		errorMessage := "drone serial number is missing"
+		log.Println("ERROR: ", errorMessage)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, errorMessage)))
+		return
+	}
+	requestByte := []byte(fmt.Sprintf(`{"drone_serial_number":"%s"}`, params[0]))
+	response, err := api.droneActionUsecase.GetLoadedMedicationItems(ctx, requestByte)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(response)
+}
