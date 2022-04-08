@@ -1,11 +1,12 @@
 package iofile
 
 import (
-	"fmt"
-	"io"
+	"errors"
+	"io/ioutil"
+	"mime"
 	"mime/multipart"
-	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -16,41 +17,40 @@ type Sizer interface {
 	Size() int64
 }
 type IIOFile interface {
-	SaveImage(multipart.File, multipart.FileHeader, string) error
-	GetInfo(multipart.File, multipart.FileHeader) (int64, string)
+	SaveImage(filePath string) (imageName string, err error)
+	GetInfo(part *multipart.Part) (int64, string, error)
 }
 
 type IOFile struct {
 	folderPath string
+	fileBytes  []byte
+	fileExt    string
 }
 
 func NewIOFile(folderPath string) IIOFile {
-	return IOFile{folderPath: folderPath}
+	return &IOFile{folderPath: folderPath}
 }
 
-func (i IOFile) SaveImage(file multipart.File, handler multipart.FileHeader, filePath string) (err error) {
-	defer file.Close()
-	f, err := os.OpenFile(i.folderPath+filePath, os.O_WRONLY|os.O_CREATE, 0666)
+func (i *IOFile) SaveImage(filePath string) (imageName string, err error) {
+	imageName = filePath + i.fileExt
+	f, err := os.Create(i.folderPath + filePath + i.fileExt)
+	_, err = f.Write(i.fileBytes)
+	err = f.Close()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return "", err
 	}
-	defer f.Close()
-	io.Copy(f, file)
-	return nil
+	return
 }
 
-func (i IOFile) GetInfo(file multipart.File, header multipart.FileHeader) (size int64, fileType string) {
-	fileHeader := make([]byte, 512)
-	if _, err := file.Read(fileHeader); err != nil {
-		return 0, ""
+func (i *IOFile) GetInfo(part *multipart.Part) (size int64, fileType string, err error) {
+	fileBytes, err := ioutil.ReadAll(part)
+	if err != nil {
+		return -1, "", errors.New("failed to read content of the part")
 	}
-
-	// set position back to start.
-	if _, err := file.Seek(0, 0); err != nil {
-		return 0, ""
-	}
-	size = file.(Sizer).Size()
-	fileType = http.DetectContentType(fileHeader)
-	return
+	fname := part.FileName()
+	dotIndex := strings.LastIndex(fname, ".")
+	i.fileExt = fname[dotIndex:]
+	fileType = mime.TypeByExtension(i.fileExt)
+	i.fileBytes = fileBytes
+	return int64(len(fileBytes)), fileType, nil
 }

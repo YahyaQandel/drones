@@ -20,9 +20,10 @@ func Test_medicationUsecase_RegisterMedication(t *testing.T) {
 		medicationRepo repository.IDroneRepo
 	}
 	type args struct {
-		ctx       context.Context
-		r         *http.Request
-		imageName string
+		ctx              context.Context
+		r                *http.Request
+		imageName        string
+		medicationParams map[string]string
 	}
 	tests := []struct {
 		name         string
@@ -33,49 +34,81 @@ func Test_medicationUsecase_RegisterMedication(t *testing.T) {
 		want         string
 	}{
 		{
-			name:    "invalid image ext",
-			args:    args{ctx: context.Background(), imageName: "invalid_image.txt"},
-			wantErr: true,
-			want:    "unsupported file type application/octet-stream, acceptable types (png/jpeg/jpg)",
+			name:         "invalid image ext",
+			fields:       fields{},
+			args:         args{ctx: context.Background(), imageName: "invalid_image.txt", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
+			wantResponse: []byte{},
+			wantErr:      true,
+			want:         "unsupported file type text/plain; charset=utf-8, acceptable types (png/jpeg/jpg)",
 		},
 		{
 			name:    "image larger than 5 mb",
-			args:    args{ctx: context.Background(), imageName: "image_5mb.jpg"},
+			args:    args{ctx: context.Background(), imageName: "image_5mb.jpg", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
 			wantErr: true,
 			want:    "image size '5.002336' is larger than 5mb",
 		},
 		{
 			name:    "successful image save",
-			args:    args{ctx: context.Background(), imageName: "test_image.jpeg"},
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "rx", "code": "RX_10", "weight": "10.1"}},
 			wantErr: false,
 			want:    "",
+		},
+		{
+			name:    "invalid medication name (special chars )",
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "$$#xfsdf", "code": "RX_10", "weight": "10.1"}},
+			wantErr: true,
+			want:    "invalid medication name, (allowed only letters, numbers, '-', '_')",
+		},
+		{
+			name:    "invalid medication name ( empty )",
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "", "code": "RX_10", "weight": "10.1"}},
+			wantErr: true,
+			want:    "invalid medication name, (allowed only letters, numbers, '-', '_')",
+		},
+		{
+			name:    "invalid medication code ( lowercase letters )",
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "rx_10", "weight": "10.1"}},
+			wantErr: true,
+			want:    "invalid medication code, (allowed only upper case letters, underscore and numbers)",
+		},
+		{
+			name:    "invalid medication code ( empty )",
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "", "weight": "10.1"}},
+			wantErr: true,
+			want:    "invalid medication code, (allowed only upper case letters, underscore and numbers)",
+		},
+		{
+			name:    "invalid weight",
+			args:    args{ctx: context.Background(), imageName: "test_image.jpeg", medicationParams: map[string]string{"name": "Rx", "code": "RX_10", "weight": "x"}},
+			wantErr: true,
+			want:    "invalid medication wegiht",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			b, w := createMultipartFormData(t, "image", fmt.Sprintf("tests-fixtures/%s", tt.args.imageName))
+			b, w := createMultipartFormData(t, "image", fmt.Sprintf("tests-fixtures/%s", tt.args.imageName), tt.args.medicationParams)
 			req, err := http.NewRequest("POST", "", &b)
 			if err != nil {
 				return
 			}
 			req.Header.Set("Content-Type", w.FormDataContentType())
 			tt.args.r = req
-			mockedRepo := mocks.NewMockedDroneRepository()
+			medicationRepo := mocks.NewMockedMedicationRepository()
 			mockedIOFile := iomocks.NewMockedIOFile()
-			medicationUsecase := NewMedicationUsecase(mockedRepo, mockedIOFile)
+			medicationUsecase := NewMedicationUsecase(medicationRepo, mockedIOFile)
 			_, err = medicationUsecase.RegisterMedication(tt.args.ctx, tt.args.r)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("medicationUsecase.RegisterMedication() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if err != nil && tt.want != err.Error() {
-				t.Errorf("medicationUsecase.RegisterMedication() = %v, want %v", tt.want, err.Error())
+				t.Errorf("medicationUsecase.RegisterMedication() = %v, want %v", err.Error(), tt.want)
 			}
 		})
 	}
 }
 
-func createMultipartFormData(t *testing.T, fieldName, fileName string) (bytes.Buffer, *multipart.Writer) {
+func createMultipartFormData(t *testing.T, fieldName, fileName string, params map[string]string) (bytes.Buffer, *multipart.Writer) {
 	var b bytes.Buffer
 	var err error
 	w := multipart.NewWriter(&b)
@@ -86,6 +119,9 @@ func createMultipartFormData(t *testing.T, fieldName, fileName string) (bytes.Bu
 	}
 	if _, err = io.Copy(fw, file); err != nil {
 		t.Errorf("Error with io.Copy: %v", err)
+	}
+	for key, val := range params {
+		_ = w.WriteField(key, val)
 	}
 	w.Close()
 	return b, w

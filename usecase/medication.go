@@ -1,13 +1,20 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"regexp"
+	"strconv"
 
 	"drones.com/iofile"
 	"drones.com/repository"
+	repoEntity "drones.com/repository/entity"
 )
 
 type IMedicationeUsecase interface {
@@ -15,33 +22,112 @@ type IMedicationeUsecase interface {
 }
 
 type medicationUsecase struct {
-	medicationRepo repository.IDroneRepo
+	medicationRepo repository.IMedicationRepo
 	ioFile         iofile.IIOFile
 }
 
-func NewMedicationUsecase(droneRepository repository.IDroneRepo, ioFile iofile.IIOFile) IMedicationeUsecase {
-	return medicationUsecase{medicationRepo: droneRepository, ioFile: ioFile}
+func NewMedicationUsecase(medicationRepository repository.IMedicationRepo, ioFile iofile.IIOFile) IMedicationeUsecase {
+	return medicationUsecase{medicationRepo: medicationRepository, ioFile: ioFile}
 }
 
 func (d medicationUsecase) RegisterMedication(ctx context.Context, r *http.Request) (response []byte, err error) {
-	r.ParseMultipartForm(32 * iofile.MB)
-	file, handler, err := r.FormFile("image")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fileSize, fileType := d.ioFile.GetInfo(file, *handler)
-	size := float64(fileSize) / float64(iofile.MB)
-	if size >= 5 {
-		return []byte{}, errors.New(fmt.Sprintf("image size '%f' is larger than 5mb", size))
-	}
-	if fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "image/png" {
-		return []byte{}, errors.New(fmt.Sprintf("unsupported file type %s, acceptable types (png/jpeg/jpg)", fileType))
-	}
-	err = d.ioFile.SaveImage(file, *handler, "ANYNAME")
+	medicationRequest := repoEntity.Medication{}
+	err = d.fillInMedicationObjFromRequest(r, &medicationRequest)
 	if err != nil {
 		return []byte{}, err
 	}
-	// repo should work here
-	return nil, nil
+	imageName, err := d.ioFile.SaveImage(medicationRequest.Name)
+	if err != nil {
+		return []byte{}, err
+	}
+	medicationRequest.Image = imageName
+	medicationObject, err := d.medicationRepo.Create(ctx, medicationRequest)
+	if err != nil {
+		return []byte{}, err
+	}
+	medicationJsonObj, err := json.Marshal(medicationObject)
+	if err != nil {
+		return []byte{}, err
+	}
+	return medicationJsonObj, nil
+}
+
+func getFormFieldValue(p *multipart.Part, field string) string {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(p)
+	return buf.String()
+}
+
+func isValidMedicationName(name string) bool {
+	// allow only letters , numbers '_' and -
+	re := regexp.MustCompile("^[a-zA-Z0-9_-]+$")
+	return re.MatchString(name)
+}
+
+func isValidMedicationCode(name string) bool {
+	// allow only uppercase letters , numbers '_'
+	re := regexp.MustCompile("^[A-Z0-9_]+$")
+	return re.MatchString(name)
+}
+
+func isValidWeight(weight string) (isValid bool, result float64) {
+	isValid = false
+	result, err := strconv.ParseFloat(weight, 64)
+	if err != nil {
+		return
+	}
+	return true, result
+}
+
+func (d medicationUsecase) fillInMedicationObjFromRequest(r *http.Request, medication *repoEntity.Medication) error {
+	reader, err := r.MultipartReader()
+	if err != nil {
+		return err
+	}
+	for {
+		p, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		field := p.FormName()
+
+		switch field {
+		case "name":
+			medicationName := getFormFieldValue(p, field)
+			if !isValidMedicationName(medicationName) {
+				return errors.New("invalid medication name, (allowed only letters, numbers, '-', '_')")
+			}
+			medication.Name = medicationName
+		case "code":
+			medicationCode := getFormFieldValue(p, field)
+			if !isValidMedicationCode(medicationCode) {
+				return errors.New("invalid medication code, (allowed only upper case letters, underscore and numbers)")
+			}
+			medication.Code = medicationCode
+		case "image":
+			fileSize, fileType, err := d.ioFile.GetInfo(p)
+			if err != nil {
+				return err
+			}
+			size := float64(fileSize) / float64(iofile.MB)
+			if size >= 5 {
+				return errors.New(fmt.Sprintf("image size '%f' is larger than 5mb", size))
+			}
+			if fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "image/png" {
+				return errors.New(fmt.Sprintf("unsupported file type %s, acceptable types (png/jpeg/jpg)", fileType))
+			}
+		case "weight":
+			medicationWeight := getFormFieldValue(p, field)
+			isValid, weightFloat := isValidWeight(medicationWeight)
+			if !isValid {
+				return errors.New("invalid medication wegiht")
+			}
+			medication.Weight = weightFloat
+		}
+
+	}
+	return nil
 }

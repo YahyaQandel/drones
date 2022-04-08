@@ -21,9 +21,10 @@ func main() {
 		panic(err)
 	}
 	droneRepository := repository.NewDroneRepository(dbClient)
+	medicationRepository := repository.NewMedicationRepository(dbClient)
 	droneUsecase := usecase.NewDroneUsecase(droneRepository)
 	ioFile := iofile.NewIOFile(MEDICATION_IMAGES_PATH)
-	medicationUsecase := usecase.NewMedicationUsecase(droneRepository, ioFile)
+	medicationUsecase := usecase.NewMedicationUsecase(medicationRepository, ioFile)
 	droneApi := server.NewDroneAPI(droneUsecase)
 	medicationApi := server.NewMedicationAPI(medicationUsecase)
 	apis := server.APIs{

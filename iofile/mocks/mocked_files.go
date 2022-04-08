@@ -13,11 +13,11 @@ func NewMockedIOFile() iofile.IIOFile {
 	return mockedIOFile{}
 }
 
-func (i mockedIOFile) SaveImage(file multipart.File, handler multipart.FileHeader, filePath string) (err error) {
-	return nil
+func (i mockedIOFile) SaveImage(filePath string) (imageName string, err error) {
+	return "", nil
 }
 
-func (i mockedIOFile) GetInfo(file multipart.File, header multipart.FileHeader) (size int64, fileType string) {
+func (i mockedIOFile) GetInfo(part *multipart.Part) (int64, string, error) {
 	iofile := iofile.NewIOFile("")
-	return iofile.GetInfo(file, header)
+	return iofile.GetInfo(part)
 }

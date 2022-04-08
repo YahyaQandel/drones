@@ -13,5 +13,6 @@ docker compose up
 ### Tests
 ```
 cd docker-tests
-docker compose up
+docker compose up --abort-on-container-exit --exit-code-from go
+docker compose down -v
 ```
