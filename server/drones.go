@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -28,7 +29,14 @@ func (api DroneApi) Create(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
 		return
 	}
-	response, err := api.droneUsecase.RegisterDrone(ctx, requestByte)
+	drone, err := api.droneUsecase.RegisterDrone(ctx, requestByte)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	response, err := json.Marshal(drone)
 	if err != nil {
 		log.Println("ERROR: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
