@@ -14,7 +14,7 @@ import (
 )
 
 type IDroneUsecase interface {
-	RegisterDrone(ctx context.Context, request []byte) ([]byte, error)
+	RegisterDrone(ctx context.Context, request []byte) (repoEntity.Drone, error)
 }
 
 type droneUsecase struct {
@@ -26,25 +26,21 @@ func NewDroneUsecase(droneRepository repository.IDroneRepo, medicationRepository
 	return droneUsecase{droneRepo: droneRepository, medicationRepo: medicationRepository}
 }
 
-func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (response []byte, err error) {
+func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (response repoEntity.Drone, err error) {
 	droneRequest := entity.Drone{}
 	err = json.Unmarshal(request, &droneRequest)
 	if IsInvalidWeightErr(err) {
-		return []byte{}, errors.New(`weight: invalid input , should be float`)
+		return repoEntity.Drone{}, errors.New(`weight: invalid input , should be float`)
 	}
 	if err != nil {
-		return []byte{}, err
+		return repoEntity.Drone{}, err
 	}
 	if !IsValidDroneModel(droneRequest) {
-		return []byte{}, errors.New(fmt.Sprintf(`model: should be option of %v`, entity.DroneModels))
+		return repoEntity.Drone{}, errors.New(fmt.Sprintf(`model: should be option of %v`, entity.DroneModels))
 	}
 	validateDroneRequest, err := govalidator.ValidateStruct(droneRequest)
 	if err != nil && !validateDroneRequest {
-		return []byte{}, err
-	}
-	response, err = json.Marshal(droneRequest)
-	if err != nil && !validateDroneRequest {
-		return []byte{}, err
+		return repoEntity.Drone{}, err
 	}
 	// by default drone battery capacity is 100 and state is IDLE in creation
 	droneRequest.BatteryCapacity = 100
@@ -55,15 +51,11 @@ func (d droneUsecase) RegisterDrone(ctx context.Context, request []byte) (respon
 	droneRepoEntity.Weight = droneRequest.Weight
 	droneRepoEntity.BatteryCapacity = droneRequest.Weight
 	droneRepoEntity.State = droneRequest.State
-	repoQueryResult, err := d.droneRepo.Create(ctx, droneRepoEntity)
+	response, err = d.droneRepo.Create(ctx, droneRepoEntity)
 	if err != nil {
-		return []byte{}, err
+		return repoEntity.Drone{}, err
 	}
-	result, err := json.Marshal(repoQueryResult)
-	if err != nil {
-		return []byte{}, nil
-	}
-	return result, nil
+	return
 }
 
 func IsInvalidWeightErr(err error) bool {

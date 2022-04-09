@@ -6,7 +6,9 @@ import (
 	"reflect"
 	"testing"
 
+	"drones.com/repository/entity"
 	"drones.com/repository/mocks"
+	usecaseEntity "drones.com/usecase/entity"
 )
 
 func Test_droneUsecase_RegisterDrone(t *testing.T) {
@@ -15,10 +17,11 @@ func Test_droneUsecase_RegisterDrone(t *testing.T) {
 		request []byte
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
+		name         string
+		args         args
+		want         string
+		wantErr      bool
+		wantResponse entity.Drone
 	}{
 		{
 			name:    "invalid serial number (contains numbers)",
@@ -49,6 +52,13 @@ func Test_droneUsecase_RegisterDrone(t *testing.T) {
 			args:    args{ctx: context.Background(), request: []byte(`{"serial_number": "SDXDFSFEAADSF","model":"Lightweight","weight":100.0}`)},
 			want:    "",
 			wantErr: false,
+			wantResponse: entity.Drone{
+				SerialNumber:    "SDXDFSFEAADSF",
+				Model:           "Lightweight",
+				Weight:          100.0,
+				State:           string(usecaseEntity.IDLE),
+				BatteryCapacity: 100.0,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -56,12 +66,15 @@ func Test_droneUsecase_RegisterDrone(t *testing.T) {
 			mockedRepo := mocks.NewMockedDroneRepository()
 			medicationRepo := mocks.NewMockedMedicationRepository()
 			droneUsecase := NewDroneUsecase(mockedRepo, medicationRepo)
-			_, err := droneUsecase.RegisterDrone(tt.args.ctx, tt.args.request)
+			gotResponse, err := droneUsecase.RegisterDrone(tt.args.ctx, tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("droneUsecase.RegisterDrone() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if (err != nil) && !reflect.DeepEqual(err.Error(), tt.want) {
+				t.Errorf("droneUsecase.RegisterDrone() = %v, want %v", err.Error(), tt.want)
+			}
+			if (gotResponse != entity.Drone{}) && !reflect.DeepEqual(gotResponse, tt.want) {
 				t.Errorf("droneUsecase.RegisterDrone() = %v, want %v", err.Error(), tt.want)
 			}
 		})
