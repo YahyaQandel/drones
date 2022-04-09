@@ -14,7 +14,7 @@ import (
 
 type IDroneActionUsecase interface {
 	LoadDrone(ctx context.Context, request []byte) ([]byte, error)
-	GetLoadedMedicationItems(ctx context.Context, request []byte) ([]byte, error)
+	GetLoadedMedicationItems(ctx context.Context, request []byte) ([]repoEntity.Medication, error)
 	GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error)
 }
 
@@ -72,36 +72,32 @@ func (d droneActionUsecase) LoadDrone(ctx context.Context, request []byte) (resp
 	return responseMessage, nil
 }
 
-func (d droneActionUsecase) GetLoadedMedicationItems(ctx context.Context, request []byte) (response []byte, err error) {
+func (d droneActionUsecase) GetLoadedMedicationItems(ctx context.Context, request []byte) (medications []repoEntity.Medication, err error) {
 	getLoadedMedicationItems := entity.GetLoadedMedicationItemsRequest{}
 	err = json.Unmarshal(request, &getLoadedMedicationItems)
 	if err != nil {
-		return []byte{}, err
+		return []repoEntity.Medication{}, err
 	}
 	if err != nil {
-		return []byte{}, err
+		return []repoEntity.Medication{}, err
 	}
 	validateGetLoadedMedicationItemsRequest, err := govalidator.ValidateStruct(getLoadedMedicationItems)
 	if err != nil && !validateGetLoadedMedicationItemsRequest {
-		return []byte{}, err
+		return []repoEntity.Medication{}, err
 	}
 	droneMedications, err := d.droneMedicationRepo.GetDroneMedications(ctx, repoEntity.DroneMedication{DroneSerialNumber: getLoadedMedicationItems.DroneSerialNumber})
 	if err != nil {
-		return []byte{}, err
+		return []repoEntity.Medication{}, err
 	}
-	medications := []repoEntity.Medication{}
+	medications = []repoEntity.Medication{}
 	for _, droneMedication := range droneMedications {
 		medication, err := d.medicationRepo.Get(ctx, repoEntity.Medication{Code: droneMedication.MedicationCode})
 		if err != nil {
-			return []byte{}, err
+			return []repoEntity.Medication{}, err
 		}
 		medications = append(medications, medication)
 	}
-	responseByte, err := json.Marshal(medications)
-	if err != nil {
-		return []byte{}, err
-	}
-	return responseByte, nil
+	return
 }
 
 func (d droneActionUsecase) GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error) {

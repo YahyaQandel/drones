@@ -167,7 +167,7 @@ func Test_droneActionUsecase_GetLoadedMedicationItems(t *testing.T) {
 		name         string
 		fields       fields
 		args         args
-		wantResponse []byte
+		wantResponse []repoEntity.Medication
 		wantErr      bool
 	}{
 		{
@@ -179,8 +179,30 @@ func Test_droneActionUsecase_GetLoadedMedicationItems(t *testing.T) {
 				medicationRepo:  mocks.NewMedicationGetAllRepository(),
 				droneActionRepo: mocks.NewMockedDroneActionGetAllMedicationRepository(),
 			},
-			wantResponse: []byte(`{{"id":"1","name":"Aspirin","weight":100.00,"code":"RX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"},{"id":"2","name":"Advil","weight":200.00,"code":"UX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"}{"id":"3","name":"Vicodin","weight":300.00,"code":"DX","image":"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"}`),
-			wantErr:      false,
+			wantResponse: []repoEntity.Medication{
+				{
+					ID:     1,
+					Name:   "Aspirin",
+					Code:   "RX",
+					Weight: 100,
+					Image:  "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+				},
+				{
+					ID:     2,
+					Name:   "Advil",
+					Code:   "UX",
+					Weight: 200,
+					Image:  "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+				},
+				{
+					ID:     3,
+					Name:   "Vicodin",
+					Code:   "DX",
+					Weight: 300,
+					Image:  "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+				},
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -191,7 +213,7 @@ func Test_droneActionUsecase_GetLoadedMedicationItems(t *testing.T) {
 				t.Errorf("droneActionUsecase.GetLoadedMedicationItems() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if string(gotResponse) == string(tt.wantResponse) {
+			if !reflect.DeepEqual(gotResponse, tt.wantResponse) {
 				t.Errorf("droneActionUsecase.GetLoadedMedicationItems() = %v, want %v", gotResponse, tt.wantResponse)
 			}
 		})

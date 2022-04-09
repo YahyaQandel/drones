@@ -52,7 +52,14 @@ func (api DroneActionApi) GetLoadedMedicationItems(w http.ResponseWriter, r *htt
 		return
 	}
 	requestByte := []byte(fmt.Sprintf(`{"drone_serial_number":"%s"}`, params[0]))
-	response, err := api.droneActionUsecase.GetLoadedMedicationItems(ctx, requestByte)
+	medications, err := api.droneActionUsecase.GetLoadedMedicationItems(ctx, requestByte)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	responseByte, err := json.Marshal(medications)
 	if err != nil {
 		log.Println("ERROR: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
@@ -60,7 +67,7 @@ func (api DroneActionApi) GetLoadedMedicationItems(w http.ResponseWriter, r *htt
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)
-	w.Write(response)
+	w.Write(responseByte)
 }
 
 func (api DroneActionApi) GetAvailableDrones(w http.ResponseWriter, r *http.Request) {
