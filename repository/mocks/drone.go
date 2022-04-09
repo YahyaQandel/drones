@@ -32,3 +32,7 @@ func (cdb DroneRepository) IsNotFoundErr(err error) bool {
 func (cdb DroneRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
+
+func (cdb DroneRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}

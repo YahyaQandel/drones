@@ -31,3 +31,7 @@ func (cdb MockedDroneLessWeightThanMedicationRepository) IsNotFoundErr(err error
 func (cdb MockedDroneLessWeightThanMedicationRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
+
+func (cdb MockedDroneLessWeightThanMedicationRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}

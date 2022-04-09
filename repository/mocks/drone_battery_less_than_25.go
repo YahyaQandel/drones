@@ -31,3 +31,7 @@ func (cdb MockedDroneBatteryLessThan25Repository) IsNotFoundErr(err error) bool 
 func (cdb MockedDroneBatteryLessThan25Repository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
+
+func (cdb MockedDroneBatteryLessThan25Repository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}

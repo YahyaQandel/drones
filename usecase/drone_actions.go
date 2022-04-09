@@ -15,6 +15,7 @@ import (
 type IDroneActionUsecase interface {
 	LoadDrone(ctx context.Context, request []byte) ([]byte, error)
 	GetLoadedMedicationItems(ctx context.Context, request []byte) ([]byte, error)
+	GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error)
 }
 
 type droneActionUsecase struct {
@@ -101,4 +102,15 @@ func (d droneActionUsecase) GetLoadedMedicationItems(ctx context.Context, reques
 		return []byte{}, err
 	}
 	return responseByte, nil
+}
+
+func (d droneActionUsecase) GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error) {
+	drones, err = d.droneRepo.GetAvailable(ctx)
+	if err != nil {
+		return []repoEntity.Drone{}, err
+	}
+	if err != nil {
+		return []repoEntity.Drone{}, err
+	}
+	return
 }

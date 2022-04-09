@@ -5,12 +5,14 @@ import (
 	"errors"
 
 	"drones.com/repository/entity"
+	usecaseEntity "drones.com/usecase/entity"
 	"gorm.io/gorm"
 )
 
 type IDroneRepo interface {
 	Create(ctx context.Context, drone entity.Drone) (entity.Drone, error)
 	Get(ctx context.Context, drone entity.Drone) (entity.Drone, error)
+	GetAvailable(ctx context.Context) ([]entity.Drone, error)
 	Update(ctx context.Context, drone entity.Drone) (entity.Drone, error)
 	IsNotFoundErr(err error) bool
 }
@@ -36,6 +38,7 @@ func (cdb DroneRepository) Update(ctx context.Context, drone entity.Drone) (enti
 	return drone, nil
 }
 
+// TODO: refactor to GetBySerialNumber
 func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	droneResponse := entity.Drone{}
 	result := cdb.client.WithContext(ctx).Where(&entity.Drone{SerialNumber: drone.SerialNumber}).Last(&droneResponse)
@@ -50,4 +53,13 @@ func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.
 
 func (cdb DroneRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
+}
+
+func (cdb DroneRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	var drones []entity.Drone
+	result := cdb.client.WithContext(ctx).Where(&entity.Drone{State: string(usecaseEntity.IDLE)}).Find(&drones)
+	if result.Error != nil {
+		return []entity.Drone{}, result.Error
+	}
+	return drones, nil
 }

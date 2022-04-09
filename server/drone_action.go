@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -52,6 +53,26 @@ func (api DroneActionApi) GetLoadedMedicationItems(w http.ResponseWriter, r *htt
 	}
 	requestByte := []byte(fmt.Sprintf(`{"drone_serial_number":"%s"}`, params[0]))
 	response, err := api.droneActionUsecase.GetLoadedMedicationItems(ctx, requestByte)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(response)
+}
+
+func (api DroneActionApi) GetAvailableDrones(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	drones, err := api.droneActionUsecase.GetAvailableDrones(ctx)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	response, err := json.Marshal(drones)
 	if err != nil {
 		log.Println("ERROR: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)

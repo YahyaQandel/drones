@@ -14,7 +14,7 @@ services:
         expose:
             - "5432"
         ports:
-          - 5050:5432
+          - 5040:5432
         healthcheck:
             test: pg_isready -U taskuser -d task
             interval: 10s
@@ -30,6 +30,6 @@ services:
         volumes:
             - .:/usr/src/myapp
         ports:
-          - 9090:9090
+          - 8050:9090
         working_dir: /usr/src/myapp
         command: bash -c "env && go get -d && go get github.com/CloudInn/gorm-goose/cmd/gorm-goose && gorm-goose -path=repository/db -pgschema=dronetask up && go run *.go"

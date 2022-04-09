@@ -30,6 +30,7 @@ func StartServer(apis APIs) {
 	droneRouter.HandleFunc("/", apis.DronesApi.Create).Methods("POST")
 	droneRouter.HandleFunc("/load", apis.DroneActionApi.Load).Methods("POST")
 	droneRouter.HandleFunc("/medication", apis.DroneActionApi.GetLoadedMedicationItems).Methods("GET")
+	droneRouter.HandleFunc("/available", apis.DroneActionApi.GetAvailableDrones).Methods("GET")
 
 	medicationRouter := r.PathPrefix("/medication").Subrouter()
 	medicationRouter.Use(auth.Auth)
@@ -41,6 +42,7 @@ func StartServer(apis APIs) {
 
 func start(port string, r http.Handler) {
 	loggingRouter := loggingHandler(r)
+	log.Println("listening on port:", port)
 	log.Fatal(http.ListenAndServe(":"+port, loggingRouter))
 }
 

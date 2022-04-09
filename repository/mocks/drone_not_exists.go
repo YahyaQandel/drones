@@ -32,3 +32,7 @@ func (cdb MockedDroneNotExistsRepository) IsNotFoundErr(err error) bool {
 func (cdb MockedDroneNotExistsRepository) Update(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{}, nil
 }
+
+func (cdb MockedDroneNotExistsRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}

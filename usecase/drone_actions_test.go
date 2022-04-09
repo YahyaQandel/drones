@@ -11,6 +11,7 @@ import (
 	repoEntity "drones.com/repository/entity"
 	"drones.com/repository/mocks"
 	"drones.com/usecase/entity"
+	usecaseEntity "drones.com/usecase/entity"
 )
 
 func Test_droneActionUsecase_LoadDrone(t *testing.T) {
@@ -192,6 +193,65 @@ func Test_droneActionUsecase_GetLoadedMedicationItems(t *testing.T) {
 			}
 			if string(gotResponse) == string(tt.wantResponse) {
 				t.Errorf("droneActionUsecase.GetLoadedMedicationItems() = %v, want %v", gotResponse, tt.wantResponse)
+			}
+		})
+	}
+}
+
+func Test_droneActionUsecase_GetAvailableDrones(t *testing.T) {
+	type fields struct {
+		droneRepo       repository.IDroneRepo
+		medicationRepo  repository.IMedicationRepo
+		droneActionRepo repository.IDroneActionRepo
+	}
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name         string
+		fields       fields
+		args         args
+		wantResponse []repoEntity.Drone
+		wantErr      bool
+	}{
+		{
+			name: "get all available drones",
+			args: args{context.Background()},
+			fields: fields{
+				droneRepo:       mocks.NewMockedDroneGetAllAvailableRepository(),
+				medicationRepo:  mocks.NewMockedMedicationRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionRepository(),
+			},
+			wantResponse: []repoEntity.Drone{
+				{
+					ID:              1,
+					SerialNumber:    "12345",
+					State:           string(usecaseEntity.IDLE),
+					Model:           "LightWeight",
+					BatteryCapacity: 60,
+					Weight:          10,
+				},
+				{
+					ID:              2,
+					SerialNumber:    "54321",
+					State:           string(usecaseEntity.IDLE),
+					Model:           "HeavyWeight",
+					BatteryCapacity: 80,
+					Weight:          20,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			droneActionUsecase := NewDroneActionUsecase(tt.fields.droneRepo, tt.fields.medicationRepo, tt.fields.droneActionRepo)
+			gotResponse, err := droneActionUsecase.GetAvailableDrones(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("droneActionUsecase.GetAvailableDrones() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotResponse, tt.wantResponse) {
+				t.Errorf("droneActionUsecase.GetAvailableDrones() = %v, want %v", gotResponse, tt.wantResponse)
 			}
 		})
 	}

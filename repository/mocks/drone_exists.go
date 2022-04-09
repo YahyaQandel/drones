@@ -34,3 +34,7 @@ func (cdb MockedDroneExistsRepository) Update(ctx context.Context, drone entity.
 	cdb.drone.State = string(usecaseEntity.LOADED)
 	return cdb.drone, nil
 }
+
+func (cdb MockedDroneExistsRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
