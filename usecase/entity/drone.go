@@ -7,6 +7,15 @@ type Drone struct {
 	BatteryCapacity float64 `json:"battery_capacity"`
 	State           string  `json:"state"`
 }
+
+type GetDroneBatteryLevelRequest struct {
+	DroneSerialNumber string `json:"drone_serial_number" valid:"required"`
+}
+
+type GetDroneBatteryLevelResponse struct {
+	BatteryLevel float64 `json:"battery_level"`
+}
+
 type modelType string
 type stateType string
 

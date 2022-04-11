@@ -278,3 +278,68 @@ func Test_droneActionUsecase_GetAvailableDrones(t *testing.T) {
 		})
 	}
 }
+
+func Test_droneActionUsecase_GetDroneBatteryLevel(t *testing.T) {
+	type fields struct {
+		droneRepo           repository.IDroneRepo
+		medicationRepo      repository.IMedicationRepo
+		droneMedicationRepo repository.IDroneActionRepo
+	}
+	type args struct {
+		ctx             context.Context
+		request         []byte
+		droneRepo       repository.IDroneRepo
+		medicationRepo  repository.IMedicationRepo
+		droneActionRepo repository.IDroneActionRepo
+	}
+	tests := []struct {
+		name            string
+		fields          fields
+		args            args
+		wantResponse    entity.GetDroneBatteryLevelResponse
+		wantErr         bool
+		wantErrResponse string
+	}{
+		{
+			name: "get drone battery level successfully",
+			args: args{
+				ctx:             context.Background(),
+				request:         []byte(`{"drone_serial_number": "XDX"}`),
+				droneRepo:       mocks.NewMockedDroneBatteryLevelRepository(),
+				medicationRepo:  mocks.NewMockedMedicationRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionRepository(),
+			},
+			wantResponse: usecaseEntity.GetDroneBatteryLevelResponse{BatteryLevel: 60},
+			wantErr:      false,
+		},
+		{
+			name: "get drone battery level ( drone not exists )",
+			args: args{
+				ctx:             context.Background(),
+				request:         []byte(`{"drone_serial_number": "YXS"}`),
+				droneRepo:       mocks.NewMockedDroneNotExistsRepository(),
+				medicationRepo:  mocks.NewMockedMedicationRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionRepository(),
+			},
+			wantResponse:    usecaseEntity.GetDroneBatteryLevelResponse{},
+			wantErr:         true,
+			wantErrResponse: `drone not found with serial number 'YXS'`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			droneActionUsecase := NewDroneActionUsecase(tt.args.droneRepo, tt.args.medicationRepo, tt.args.droneActionRepo)
+			gotResponse, err := droneActionUsecase.GetDroneBatteryLevel(tt.args.ctx, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("droneActionUsecase.GetDroneBatteryLevel() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(tt.wantResponse, gotResponse) {
+				t.Errorf("droneActionUsecase.GetDroneBatteryLevel() = %v, want %v", gotResponse, tt.wantResponse)
+			}
+			if tt.wantErrResponse != "" && !reflect.DeepEqual(tt.wantErrResponse, err.Error()) {
+				t.Errorf("droneActionUsecase.GetDroneBatteryLevel() = %v, want %v", err.Error(), tt.wantErrResponse)
+			}
+		})
+	}
+}

@@ -16,6 +16,7 @@ type IDroneActionUsecase interface {
 	LoadDrone(ctx context.Context, request []byte) ([]byte, error)
 	GetLoadedMedicationItems(ctx context.Context, request []byte) ([]repoEntity.Medication, error)
 	GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error)
+	GetDroneBatteryLevel(ctx context.Context, request []byte) (batteryLevel entity.GetDroneBatteryLevelResponse, err error)
 }
 
 type droneActionUsecase struct {
@@ -108,5 +109,30 @@ func (d droneActionUsecase) GetAvailableDrones(ctx context.Context) (drones []re
 	if err != nil {
 		return []repoEntity.Drone{}, err
 	}
+	return
+}
+
+func (d droneActionUsecase) GetDroneBatteryLevel(ctx context.Context, request []byte) (batteryLevel entity.GetDroneBatteryLevelResponse, err error) {
+	getDroneBatteryLevel := entity.GetDroneBatteryLevelRequest{}
+	err = json.Unmarshal(request, &getDroneBatteryLevel)
+	if err != nil {
+		return entity.GetDroneBatteryLevelResponse{}, err
+	}
+	if err != nil {
+		return entity.GetDroneBatteryLevelResponse{}, err
+	}
+	validateGetDroneBatteryLevelRequest, err := govalidator.ValidateStruct(getDroneBatteryLevel)
+	if err != nil && !validateGetDroneBatteryLevelRequest {
+		return entity.GetDroneBatteryLevelResponse{}, err
+	}
+	drone, err := d.droneRepo.Get(ctx, repoEntity.Drone{SerialNumber: getDroneBatteryLevel.DroneSerialNumber})
+	if err != nil && d.droneRepo.IsNotFoundErr(err) {
+		return entity.GetDroneBatteryLevelResponse{}, errors.New(fmt.Sprintf("drone not found with serial number '%s'", getDroneBatteryLevel.DroneSerialNumber))
+	}
+	if err != nil {
+		return entity.GetDroneBatteryLevelResponse{}, err
+	}
+
+	batteryLevel.BatteryLevel = drone.BatteryCapacity
 	return
 }
