@@ -29,6 +29,7 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] check drone battery level for a given drone;
     - [X] A drone battery decreases each 1 minute by `3%` if his state is `LOADED`
     - [X] periodic task checks drone battery level
+    - [X] add swagger for apis reference
 
 
 ### System behaviors
