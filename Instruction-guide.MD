@@ -26,7 +26,7 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] Load drone with medication
     - [✔] Checking loaded medication items for a given drone;
     - [✔] checking available drones for loading;
-    - [X] check drone battery level for a given drone;
+    - [✔] check drone battery level for a given drone;
     - [X] A drone battery decreases each 1 minute by `3%` if his state is `LOADED`
     - [X] periodic task checks drone battery level
 
@@ -92,6 +92,12 @@ curl --request GET \
 ```
 curl --request GET \
   --url http://localhost:9090/api/drone/available \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
+```
+* Get drone battery level
+```
+curl --request GET \
+  --url 'http://localhost:9090/api/drone/battery?drone_serial_number=secondDrone' \
   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
 ```
 
