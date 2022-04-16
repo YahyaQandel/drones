@@ -7,6 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/ieee0824/getenv v1.0.0
+	github.com/jasonlvhit/gocron v0.0.1
 	gorm.io/driver/postgres v1.2.2
 	gorm.io/gorm v1.22.5
 )

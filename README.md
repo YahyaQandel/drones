@@ -28,7 +28,7 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] checking available drones for loading;
     - [✔] check drone battery level for a given drone;
     - [✔] add swagger for apis reference
-    - [X] A drone battery decreases each 1 minute by `3%` if his state is `LOADED`
+    - [✔] A drone battery decreases each 5 seconds by `3%` if his state is `LOADED`
     - [X] periodic task checks drone battery level
     - [X] add audit/history for all drones battery levels
 
