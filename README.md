@@ -27,9 +27,10 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] Checking loaded medication items for a given drone;
     - [✔] checking available drones for loading;
     - [✔] check drone battery level for a given drone;
+    - [✔] add swagger for apis reference
     - [X] A drone battery decreases each 1 minute by `3%` if his state is `LOADED`
     - [X] periodic task checks drone battery level
-    - [X] add swagger for apis reference
+    - [X] add audit/history for all drones battery levels
 
 
 ### System behaviors
@@ -39,8 +40,7 @@ what i have developed is marked by ✔ and what i wish i had time and could have
 you will need to call `/drone/load` multiple times each with the new medication 
 3- Medication code is a unique identifier
 4- images saved with medication code
-5- Images are not uploaded to any server it is just saved on your repo , what should be done is to push images to 
-remote server specific for images (amazon bucker for example)
+5- Images are not uploaded to any server it is just saved on your repo , what should be done is to push images to remote server specific for images (amazon bucket for example)
 
 
 ### Functionality 

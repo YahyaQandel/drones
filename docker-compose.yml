@@ -33,3 +33,15 @@ services:
           - 8050:9090
         working_dir: /usr/src/myapp
         command: bash -c "env && go get -d && go get github.com/CloudInn/gorm-goose/cmd/gorm-goose && gorm-goose -path=repository/db -pgschema=dronetask up && go run *.go"
+
+    swagger:
+        image: quay.io/goswagger/swagger
+        container_name: docs
+        volumes:
+            - .:/usr/src/app
+        expose:
+            - "4141"
+        ports:
+          - 4141:4141
+        working_dir: /usr/src/app
+        command: serve swagger.yml --no-open --port=4141
