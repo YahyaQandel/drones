@@ -343,3 +343,62 @@ func Test_droneActionUsecase_GetDroneBatteryLevel(t *testing.T) {
 		})
 	}
 }
+
+func Test_droneActionUsecase_GetLoadedDrones(t *testing.T) {
+	type fields struct {
+		droneRepo       repository.IDroneRepo
+		medicationRepo  repository.IMedicationRepo
+		droneActionRepo repository.IDroneActionRepo
+	}
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name       string
+		fields     fields
+		args       args
+		wantDrones []repoEntity.Drone
+		wantErr    bool
+	}{
+		{
+			name: "get all loaded drones",
+			args: args{context.Background()},
+			fields: fields{
+				droneRepo:       mocks.NewMockedDroneGetAllLoadedRepository(),
+				medicationRepo:  mocks.NewMockedMedicationRepository(),
+				droneActionRepo: mocks.NewMockedDroneActionRepository(),
+			},
+			wantDrones: []repoEntity.Drone{
+				{
+					ID:              1,
+					SerialNumber:    "12345",
+					State:           string(usecaseEntity.LOADED),
+					Model:           "LightWeight",
+					BatteryCapacity: 60,
+					Weight:          10,
+				},
+				{
+					ID:              2,
+					SerialNumber:    "54321",
+					State:           string(usecaseEntity.LOADED),
+					Model:           "HeavyWeight",
+					BatteryCapacity: 80,
+					Weight:          20,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			droneActionUsecase := NewDroneActionUsecase(tt.fields.droneRepo, tt.fields.medicationRepo, tt.fields.droneActionRepo)
+			gotDrones, err := droneActionUsecase.GetLoadedDrones(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("droneActionUsecase.GetLoadedDrones() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotDrones, tt.wantDrones) {
+				t.Errorf("droneActionUsecase.GetLoadedDrones() = %v, want %v", gotDrones, tt.wantDrones)
+			}
+		})
+	}
+}

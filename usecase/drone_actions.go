@@ -16,6 +16,7 @@ type IDroneActionUsecase interface {
 	LoadDrone(ctx context.Context, request []byte) ([]byte, error)
 	GetLoadedMedicationItems(ctx context.Context, request []byte) ([]repoEntity.Medication, error)
 	GetAvailableDrones(ctx context.Context) (drones []repoEntity.Drone, err error)
+	GetLoadedDrones(ctx context.Context) (drones []repoEntity.Drone, err error)
 	GetDroneBatteryLevel(ctx context.Context, request []byte) (batteryLevel entity.GetDroneBatteryLevelResponse, err error)
 }
 
@@ -106,6 +107,11 @@ func (d droneActionUsecase) GetAvailableDrones(ctx context.Context) (drones []re
 	if err != nil {
 		return []repoEntity.Drone{}, err
 	}
+	return
+}
+
+func (d droneActionUsecase) GetLoadedDrones(ctx context.Context) (drones []repoEntity.Drone, err error) {
+	drones, err = d.droneRepo.GetLoaded(ctx)
 	if err != nil {
 		return []repoEntity.Drone{}, err
 	}

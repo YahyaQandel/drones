@@ -35,3 +35,7 @@ func (cdb MockedDroneLessWeightThanMedicationRepository) Update(ctx context.Cont
 func (cdb MockedDroneLessWeightThanMedicationRepository) GetAvailable(ctx context.Context) ([]entity.Drone, error) {
 	return []entity.Drone{}, nil
 }
+
+func (cdb MockedDroneLessWeightThanMedicationRepository) GetLoaded(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}

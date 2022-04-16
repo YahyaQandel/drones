@@ -89,6 +89,25 @@ func (api DroneActionApi) GetAvailableDrones(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusAccepted)
 	w.Write(response)
 }
+func (api DroneActionApi) GetLoadedDrones(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	drones, err := api.droneActionUsecase.GetLoadedDrones(ctx)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	response, err := json.Marshal(drones)
+	if err != nil {
+		log.Println("ERROR: ", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%s"}`, err.Error())))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(response)
+}
 
 func (api DroneActionApi) GetDroneBatteryLevel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

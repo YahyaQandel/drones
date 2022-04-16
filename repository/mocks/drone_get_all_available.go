@@ -53,3 +53,7 @@ func (cdb MockedDroneGetAllAvailableRepository) GetAvailable(ctx context.Context
 		},
 	}, nil
 }
+
+func (cdb MockedDroneGetAllAvailableRepository) GetLoaded(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
