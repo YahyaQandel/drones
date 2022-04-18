@@ -47,6 +47,7 @@ you will need to call `/drone/load` multiple times each with the new medication
 
 - after you run `docker compose up` please visit
 `http://localhost:4141/docs` for openApi documentaion.
+![Graph](/api-docs.png "system design")
 
 ### System diagram
 ![Graph](/drone.jpg "system design")
