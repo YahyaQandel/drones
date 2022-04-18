@@ -33,7 +33,7 @@ func (cdb DroneActionRepository) CreateDroneMedication(ctx context.Context, dron
 
 func (cdb DroneActionRepository) Get(ctx context.Context, droneMedication entity.DroneMedication) (entity.DroneMedication, error) {
 	droneMedicationResponse := entity.DroneMedication{}
-	result := cdb.client.WithContext(ctx).Where(&entity.DroneMedication{DroneSerialNumber: droneMedication.DroneSerialNumber}).Last(&droneMedicationResponse)
+	result := cdb.client.WithContext(ctx).Where(&entity.DroneMedication{DroneSerialNumber: droneMedication.DroneSerialNumber, MedicationCode: droneMedication.MedicationCode}).Last(&droneMedicationResponse)
 	if cdb.IsNotFoundErr(result.Error) {
 		return entity.DroneMedication{}, result.Error
 	}

@@ -31,7 +31,9 @@ func (cdb MockedDroneBatteryLevelRepository) Get(ctx context.Context, drone enti
 		Weight:          10,
 	}, nil
 }
-
+func (cdb MockedDroneBatteryLevelRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb MockedDroneBatteryLevelRepository) IsNotFoundErr(err error) bool {
 	return false
 }

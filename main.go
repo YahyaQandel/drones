@@ -14,7 +14,8 @@ import (
 )
 
 const MEDICATION_IMAGES_PATH = "medications-images/"
-const SCHEDULER_WAIT_SCEONDS = 5
+const BATTERY_LEVEL_SCHEDULER_WAIT_SCEONDS = 20
+const SAVE_LOG_SCHEDULER_WAIT_SCEONDS = 60
 
 type fn func(ctx context.Context) error
 
@@ -28,8 +29,10 @@ func main() {
 	droneRepository := repository.NewDroneRepository(dbClient)
 	medicationRepository := repository.NewMedicationRepository(dbClient)
 	droneMedicationRepository := repository.NewDroneActionRepository(dbClient)
+	droneLogRepository := repository.NewDroneLogRepository(dbClient)
 	droneUsecase := usecase.NewDroneUsecase(droneRepository, medicationRepository)
 	droneActionUsecase := usecase.NewDroneActionUsecase(droneRepository, medicationRepository, droneMedicationRepository)
+	droneLogUsecase := usecase.NewLogUsecase(droneRepository, droneLogRepository)
 	ioFile := iofile.NewIOFile(MEDICATION_IMAGES_PATH)
 	medicationUsecase := usecase.NewMedicationUsecase(medicationRepository, ioFile)
 	droneApi := server.NewDroneAPI(droneUsecase)
@@ -40,14 +43,14 @@ func main() {
 		MedicationApi:  medicationApi,
 		DroneActionApi: droneActionApi,
 	}
-	schedulerUsecase := usecase.NewSchedulerUsecase(droneActionUsecase, droneRepository)
-	go runSchedulerEveryXSeconds(schedulerUsecase.UpdateLoadedDronesBatteryLevel)
+	schedulerUsecase := usecase.NewSchedulerUsecase(droneActionUsecase, droneLogUsecase, droneRepository)
+	go runSchedulerEveryXSeconds(schedulerUsecase.UpdateLoadedDronesBatteryLevel, BATTERY_LEVEL_SCHEDULER_WAIT_SCEONDS)
+	go runSchedulerEveryXSeconds(droneLogUsecase.LogDroneInfo, SAVE_LOG_SCHEDULER_WAIT_SCEONDS)
 	server.StartServer(apis)
 }
 
-func runSchedulerEveryXSeconds(schedluerFn fn) {
-	log.Println("asdfasdf")
+func runSchedulerEveryXSeconds(schedluerFn fn, seconds int) {
 	s := gocron.NewScheduler()
-	s.Every(SCHEDULER_WAIT_SCEONDS).Seconds().Do(schedluerFn, context.Background())
+	s.Every(uint64(seconds)).Seconds().Do(schedluerFn, context.Background())
 	<-s.Start()
 }

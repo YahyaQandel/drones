@@ -24,7 +24,9 @@ func (cdb *MockedUpdatedLoadedDronePeriodicallyRepository) Create(ctx context.Co
 func (cdb *MockedUpdatedLoadedDronePeriodicallyRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return cdb.drone, nil
 }
-
+func (cdb MockedUpdatedLoadedDronePeriodicallyRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb *MockedUpdatedLoadedDronePeriodicallyRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
 }

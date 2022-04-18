@@ -23,7 +23,9 @@ func (cdb MockedDroneBatteryLessThan25Repository) Create(ctx context.Context, dr
 func (cdb MockedDroneBatteryLessThan25Repository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{BatteryCapacity: cdb.batteryCapacity, State: string(usecaseEntity.IDLE)}, nil
 }
-
+func (cdb MockedDroneBatteryLessThan25Repository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb MockedDroneBatteryLessThan25Repository) IsNotFoundErr(err error) bool {
 	return false
 }

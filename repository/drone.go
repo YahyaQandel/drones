@@ -12,6 +12,7 @@ import (
 type IDroneRepo interface {
 	Create(ctx context.Context, drone entity.Drone) (entity.Drone, error)
 	Get(ctx context.Context, drone entity.Drone) (entity.Drone, error)
+	GetAll(ctx context.Context) ([]entity.Drone, error)
 	GetAvailable(ctx context.Context) ([]entity.Drone, error)
 	GetLoaded(ctx context.Context) ([]entity.Drone, error)
 	Update(ctx context.Context, drone entity.Drone) (entity.Drone, error)
@@ -50,6 +51,18 @@ func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.
 		return entity.Drone{}, result.Error
 	}
 	return droneResponse, nil
+}
+
+func (cdb DroneRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	dronesResponse := []entity.Drone{}
+	result := cdb.client.WithContext(ctx).Find(&dronesResponse)
+	if cdb.IsNotFoundErr(result.Error) {
+		return []entity.Drone{}, result.Error
+	}
+	if result.Error != nil {
+		return []entity.Drone{}, result.Error
+	}
+	return dronesResponse, nil
 }
 
 func (cdb DroneRepository) IsNotFoundErr(err error) bool {

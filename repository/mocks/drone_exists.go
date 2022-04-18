@@ -25,7 +25,11 @@ func (cdb MockedDroneExistsRepository) Create(ctx context.Context, drone entity.
 func (cdb MockedDroneExistsRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return cdb.drone, nil
 }
-
+func (cdb MockedDroneExistsRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{
+		cdb.drone,
+	}, nil
+}
 func (cdb MockedDroneExistsRepository) IsNotFoundErr(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
 }

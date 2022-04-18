@@ -29,8 +29,8 @@ what i have developed is marked by ✔ and what i wish i had time and could have
     - [✔] check drone battery level for a given drone;
     - [✔] add swagger for apis reference
     - [✔] A drone battery decreases each 5 seconds by `3%` if his state is `LOADED`
-    - [X] periodic task checks drone battery level
-    - [X] add audit/history for all drones battery levels
+    - [✔] periodic task checks drone battery level
+    - [✔] add audit/history for all drones battery levels
 
 
 ### System behaviors
@@ -43,64 +43,10 @@ you will need to call `/drone/load` multiple times each with the new medication
 5- Images are not uploaded to any server it is just saved on your repo , what should be done is to push images to remote server specific for images (amazon bucket for example)
 
 
-### Functionality 
+### System Apis 
 
-* Register drone request
-```
-curl --request POST \
-  --url http://localhost:9090/api/drone/ \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"serial_number": "firstDrone",
-	"model": "Lightweight",
-	"weight": 60
-}'
-```
-
-* Register medication
-```
-curl --request POST \
-  --url http://localhost:9090/api/medication/ \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
-  --header 'Content-Type: multipart/form-data; boundary=---011000010111000001101001' \
-  --form image=@/home/yahia/Pictures/2022-04-05_12-55.png \
-  --form name=panadol \
-  --form weight=20.6 \
-  --form code=PDL1
-  ```
-  
-  * Load drone with medication
-  ```
-  curl --request POST \
-  --url http://localhost:9090/api/drone/load \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"drone_serial_number":"firstDrone",
-	"medication_code":"PDL1"
-}'
-```
-
-* Get all loaded medication items
-```
-curl --request GET \
-  --url 'http://localhost:9090/api/drone/medication?drone_serial_number=firstDrone' \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
-  ````
-
-* Get all available drones ( state IDLE )
-```
-curl --request GET \
-  --url http://localhost:9090/api/drone/available \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
-```
-* Get drone battery level
-```
-curl --request GET \
-  --url 'http://localhost:9090/api/drone/battery?drone_serial_number=secondDrone' \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME'
-```
+- after you run `docker compose up` please visit
+`http://localhost:4141/docs` for openApi documentaion.
 
 ### System diagram
 ![Graph](/drone.jpg "system design")

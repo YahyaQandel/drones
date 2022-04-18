@@ -24,7 +24,9 @@ func (cdb MockedDroneGetAllLoadedRepository) Create(ctx context.Context, drone e
 func (cdb MockedDroneGetAllLoadedRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{State: string(usecaseEntity.IDLE)}, nil
 }
-
+func (cdb MockedDroneGetAllLoadedRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb MockedDroneGetAllLoadedRepository) IsNotFoundErr(err error) bool {
 	return false
 }

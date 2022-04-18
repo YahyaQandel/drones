@@ -2,11 +2,9 @@ package mocks
 
 import (
 	"context"
-	"errors"
 
 	"drones.com/repository"
 	"drones.com/repository/entity"
-	"gorm.io/gorm"
 )
 
 type MockedDroneActionRepository struct {
@@ -25,7 +23,7 @@ func (cdb MockedDroneActionRepository) Get(ctx context.Context, droneMedication 
 }
 
 func (cdb MockedDroneActionRepository) IsNotFoundErr(err error) bool {
-	return errors.Is(err, gorm.ErrRecordNotFound)
+	return true
 }
 
 func (cdb MockedDroneActionRepository) GetDroneMedications(ctx context.Context, droneMedication entity.DroneMedication) ([]entity.DroneMedication, error) {

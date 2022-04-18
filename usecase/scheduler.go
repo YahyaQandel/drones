@@ -10,15 +10,17 @@ import (
 
 type ISchedulerUsecase interface {
 	UpdateLoadedDronesBatteryLevel(ctx context.Context) error
+	LogDronesInfo(ctx context.Context) error
 }
 
 type schedulerUsecase struct {
 	droneActionUsecase IDroneActionUsecase
+	logUsecase         ILogUsecase
 	droneRepo          repository.IDroneRepo
 }
 
-func NewSchedulerUsecase(droneActionUsecase IDroneActionUsecase, droneRepo repository.IDroneRepo) ISchedulerUsecase {
-	return schedulerUsecase{droneActionUsecase: droneActionUsecase, droneRepo: droneRepo}
+func NewSchedulerUsecase(droneActionUsecase IDroneActionUsecase, logUsecase ILogUsecase, droneRepo repository.IDroneRepo) ISchedulerUsecase {
+	return schedulerUsecase{droneActionUsecase: droneActionUsecase, logUsecase: logUsecase, droneRepo: droneRepo}
 }
 
 func (s schedulerUsecase) UpdateLoadedDronesBatteryLevel(ctx context.Context) error {
@@ -41,5 +43,10 @@ func (s schedulerUsecase) UpdateLoadedDronesBatteryLevel(ctx context.Context) er
 		}
 		log.Println(fmt.Sprintf("Drone %s battery level is %f", drone.SerialNumber, drone.BatteryCapacity))
 	}
+	return nil
+}
+
+func (s schedulerUsecase) LogDronesInfo(ctx context.Context) error {
+	// use log usecase instead
 	return nil
 }

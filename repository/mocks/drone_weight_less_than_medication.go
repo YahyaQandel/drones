@@ -21,9 +21,11 @@ func (cdb MockedDroneLessWeightThanMedicationRepository) Create(ctx context.Cont
 }
 
 func (cdb MockedDroneLessWeightThanMedicationRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
-	return entity.Drone{Weight: cdb.weight, State: string(usecaseEntity.IDLE)}, nil
+	return entity.Drone{Weight: cdb.weight, State: string(usecaseEntity.IDLE), BatteryCapacity: 50}, nil
 }
-
+func (cdb MockedDroneLessWeightThanMedicationRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb MockedDroneLessWeightThanMedicationRepository) IsNotFoundErr(err error) bool {
 	return false
 }

@@ -87,6 +87,20 @@ func Test_droneActionUsecase_LoadDrone(t *testing.T) {
 			droneState: string(entity.IDLE),
 		},
 		{
+			// TODO: add test assertion that repo droneMedication create method not called
+			name: "drone cannot be loaded with medications total weights more than drone capacity",
+			args: args{
+				ctx:             context.Background(),
+				request:         []byte(`{"drone_serial_number": "XDX","medication_code":"RX"}`),
+				droneRepo:       mocks.NewMockedDroneLessWeightThanMedicationRepository(50),
+				medicationRepo:  mocks.NewMedicationTotalWeightMoreThanDroneCapacityRepository(100),
+				droneActionRepo: mocks.NewMockedDroneActionTotalMedicationsWeightMoreThanDroneCapacityRepository(),
+			},
+			want:       fmt.Sprintf("cannot load drone with medication as medication weight is '%0.2f' and drone is already loaded with '%0.2f'", 20.00, 48.00),
+			wantErr:    true,
+			droneState: string(entity.IDLE),
+		},
+		{
 			// TODO: add assertion that repo droneMedication create method not called
 			name: "drone cannot be loaded if battery capacity is less than 25%",
 			args: args{

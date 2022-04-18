@@ -24,7 +24,9 @@ func (cdb DroneRepository) Create(ctx context.Context, drone entity.Drone) (enti
 func (cdb DroneRepository) Get(ctx context.Context, drone entity.Drone) (entity.Drone, error) {
 	return entity.Drone{State: string(usecaseEntity.IDLE)}, nil
 }
-
+func (cdb DroneRepository) GetAll(ctx context.Context) ([]entity.Drone, error) {
+	return []entity.Drone{}, nil
+}
 func (cdb DroneRepository) IsNotFoundErr(err error) bool {
 	return false
 }

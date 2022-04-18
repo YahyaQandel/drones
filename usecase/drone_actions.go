@@ -43,10 +43,7 @@ func (d droneActionUsecase) LoadDrone(ctx context.Context, request []byte) (resp
 	}
 	loadDroneRepoEntity := repoEntity.DroneMedication{DroneSerialNumber: loadDrone.DroneSerialNumber, MedicationCode: loadDrone.MedicationCode}
 	droneMedicationExists, err := d.droneActionRepo.Get(ctx, loadDroneRepoEntity)
-	if err != nil {
-		return []byte{}, err
-	}
-	if droneMedicationExists.DroneSerialNumber != "" {
+	if !d.droneActionRepo.IsNotFoundErr(err) {
 		return []byte{}, errors.New(fmt.Sprintf("drone with serial number '%s' is already loaded with medication with code '%s'", droneMedicationExists.DroneSerialNumber, droneMedicationExists.MedicationCode))
 	}
 	drone, err := d.droneRepo.Get(ctx, repoEntity.Drone{SerialNumber: loadDrone.DroneSerialNumber})
@@ -60,6 +57,23 @@ func (d droneActionUsecase) LoadDrone(ctx context.Context, request []byte) (resp
 	if medication.Weight > drone.Weight {
 		return []byte{}, errors.New(fmt.Sprintf("drone weight '%0.2f' is not enough to carry medication with weight '%0.2f'", drone.Weight, medication.Weight))
 	}
+	// handle drone should not be loaded with weight greater than its capacity
+	droneLoadedMedications, err := d.droneActionRepo.GetDroneMedications(ctx, loadDroneRepoEntity)
+	if err != nil {
+		return []byte{}, err
+	}
+	totalDroneWeightLoad := 0.0
+	for _, droneMedication := range droneLoadedMedications {
+		loadedMedication, err := d.medicationRepo.Get(ctx, repoEntity.Medication{Code: droneMedication.MedicationCode})
+		if err != nil {
+			return []byte{}, err
+		}
+		totalDroneWeightLoad += loadedMedication.Weight
+	}
+	if totalDroneWeightLoad+medication.Weight > drone.Weight {
+		return []byte{}, errors.New(fmt.Sprintf("cannot load drone with medication as medication weight is '%0.2f' and drone is already loaded with '%0.2f'", medication.Weight, totalDroneWeightLoad))
+	}
+
 	if drone.BatteryCapacity < 25.00 {
 		return []byte{}, errors.New(fmt.Sprintf("cannot load drone with medication while battery capacity is '%0.2f'", drone.BatteryCapacity))
 	}
