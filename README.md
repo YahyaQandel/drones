@@ -56,9 +56,9 @@ you will need to call `/drone/load` multiple times each with the new medication
 
 ### Data seeds
 * after you start your server by running `docker compose up` the database will be loaded with a dump that conatins.
-1- 4 registered drones 
-2- 2 medications
-3- 2 loaded drones with medications
+    *  4 registered drones 
+    * 2 medications
+    * 2 loaded drones with medications
 
 - if you want to check the database you can isntall `pgAdmin` from this [link](https://www.tecmint.com/install-postgresql-and-pgadmin-in-ubuntu/)
 - i have exposed postgres container you can connect to it using port 5444.
