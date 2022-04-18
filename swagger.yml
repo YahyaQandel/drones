@@ -21,7 +21,6 @@ paths:
       - "drone"
       summary: "register new drone"
       description: ""
-      operationId: "addPet"
       consumes:
       - "application/json"
       produces:
@@ -253,5 +252,3 @@ definitions:
         - DELIVERED
         - RETURNING
         default: "IDLE"
-    xml:
-      name: "Pet"
