@@ -50,6 +50,24 @@ you will need to call `/drone/load` multiple times each with the new medication
 `http://localhost:4141/docs` for openApi documentaion.
 ![Graph](/api-docs.png "system design")
 
+#### Please note that you should use token 
+`Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME`
+#### in order to succeed accessing api results.
+
+sample curl reqeust ( register drone ) :-
+
+```
+curl --request POST \
+  --url http://localhost:9090/api/drone/ \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IllhaHlhUWFuZGVsIiwiaWF0IjoxNjQ5MTIzNzYxfQ.DRJjBQSomEs7NI1DPQQQv9_Xvt7dBIqXsmfiEhCURME' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"serial_number": "firstDrone",
+	"model": "Lightweight",
+	"weight": 60
+}'
+```
+
 ### System diagram
 ![Graph](/drone.jpg "system design")
 
