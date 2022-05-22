@@ -19,7 +19,6 @@ docker compose down -v
 
 ### Features
 what i have developed is marked by ✔ and what i wish i had time and could have developed is marked by X.
-` i will still add to that repo on my github account even after deadline to make it useful and in proper state`
 
     - [✔] Register drone
     - [✔] Register medication 
