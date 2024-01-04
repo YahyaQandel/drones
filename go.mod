@@ -13,7 +13,6 @@ require (
 )
 
 require (
-	github.com/Altoros/gorm-goose v0.0.0-20160909145528-36a094ba1d29 // indirect
 	github.com/CloudInn/gorm-goose v0.0.0-20211114125929-98752dce82b8 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-testfixtures/testfixtures/v3 v3.6.1 // indirect
